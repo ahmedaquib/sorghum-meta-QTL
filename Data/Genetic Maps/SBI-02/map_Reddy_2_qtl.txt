@@ -1,2 +1,0 @@
-mapName=Reddy_2
-QGlab-dsr02-2	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.047	27.0	19.92227529	34.07772471

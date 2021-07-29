@@ -1,3 +1,0 @@
-mapName=Xu_2000
-Stg1	Stay Green	null	null	null	A	A	1.0	0.196	45.0	40.75697626	49.24302374
-Stg2	Stay Green	null	null	null	A	A	1.0	0.303	71.0	68.25533778	73.74466222

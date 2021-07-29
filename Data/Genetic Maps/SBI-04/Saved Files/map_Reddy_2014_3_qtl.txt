@@ -1,2 +1,0 @@
-mapName=Reddy_2014_3
-QGlb-dsr04-3	Stay Green	null	null	null	SBI-04	SBI-04	1.0	0.038	1.0	-7.754027927	9.754027927

@@ -1,2 +1,0 @@
-mapName=Kebede_2001
-Stg E	Stay Green	null	null	null	SBI-07	SBI-07	1.0	0.13	60.0	54.98461538	65.01538462

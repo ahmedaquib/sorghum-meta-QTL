@@ -1,4 +1,0 @@
-mapName=Kebede_2001
-Stg J-1	Stay Green	null	null	null	SBI-05	SBI-05	1.0	0.154	30.0	25.76623377	34.23376623
-Stg J-2	Stay Green	null	null	null	SBI-05	SBI-05	1.0	0.139	30.0	25.30935252	34.69064748
-Stg J-3	Stay Green	null	null	null	SBI-05	SBI-05	1.0	0.155	30.0	25.79354839	34.20645161

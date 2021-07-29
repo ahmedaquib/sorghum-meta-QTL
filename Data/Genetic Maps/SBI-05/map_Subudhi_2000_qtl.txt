@@ -1,2 +1,0 @@
-mapName=Subudhi_2000
-Stg4	Stay Green	null	null	null	SBI-05	SBI-05	1.0	0.094	7.5	-1.347155884	16.34715588

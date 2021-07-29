@@ -1,9 +1,0 @@
-mapName=Reddy_3
-QGlm-dsr02-3a	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.139	38.6	36.20681251	40.99318749
-QGlam-dsr02-3b	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.057	42.7	36.86398138	48.53601862
-QGlm-dsr02-3b	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.08199999999999999	45.7	41.64325535	49.75674465
-QGlm-dsr02-3c	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.051	49.4	42.87739096	55.92260904
-QPglm-dsr02-3b	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.057	49.4	43.56398138	55.23601862
-QPglam-dsr02-3	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.131	54.9	52.36066365	57.43933635
-QGlam-dsr02-3a	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.107	55.9	52.79109289	59.00890711
-QPglm-dsr02-3a	Stay Green	null	null	null	SBI-02	SBI-02	1.0	0.149	57.9	55.66742912	60.13257088

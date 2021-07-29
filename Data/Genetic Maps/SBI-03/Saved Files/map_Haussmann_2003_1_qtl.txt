@@ -1,3 +1,0 @@
-mapName=Haussmann_2003_1
-GL30 2	Stay Green	null	null	null	SBI-03	SBI-03	1.0	0.124	35.0	32.09177848	37.90822152
-GL15 1	Stay Green	null	null	null	SBI-03	SBI-03	1.0	0.263	40.0	38.62882331	41.37117669

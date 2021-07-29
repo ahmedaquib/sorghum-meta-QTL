@@ -1,2 +1,0 @@
-mapName=Tau_2000
-QStg1	Stay Green	null	null	null	A	A	1.0	0.153	164.61	161.10552804000002	168.11447196

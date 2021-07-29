@@ -1,2 +1,0 @@
-mapName=Tau_2000
-QStg5	Stay Green	null	null	null	SBI-10	SBI-10	1	11.2	210	205.212641	214.787359

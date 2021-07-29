@@ -1,2 +1,0 @@
-mapName=Srinivas_2008
-QPglam-sbi09	Stay Green	null	null	null	SBI-09	SBI-09	1.0	0.075	45.6	23.42312925	67.77687075

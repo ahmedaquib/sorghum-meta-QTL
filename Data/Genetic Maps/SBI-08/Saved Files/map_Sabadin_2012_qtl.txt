@@ -1,2 +1,0 @@
-mapName=Sabadin_2012
-St8	Stay Green	null	null	null	SBI-08	SBI-08	1.0	0.02121	102.0	63.5747289	140.4252711

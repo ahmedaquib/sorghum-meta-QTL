@@ -1,2 +1,0 @@
-mapName=Kebede_2001
-Stg A	Stay Green	null	null	null	A	A	1.0	0.102	55.0	48.60784314	61.39215686

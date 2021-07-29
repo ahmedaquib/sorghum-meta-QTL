@@ -1,2 +1,0 @@
-mapName=Sabadin_2012
-St10	Stay Green	null	null	null	SBI-10	SBI-10	1	5.41	187.2	172.135305	202.264695

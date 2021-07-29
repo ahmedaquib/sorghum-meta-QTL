@@ -1,2 +1,0 @@
-mapName=Sabadin_2012
-St4	Stay Green	null	null	null	SBI-04	SBI-04	1.0	0.1079	40.0	32.44670992	47.55329008

@@ -1,2 +1,0 @@
-mapName=Crasta_1999
-SGG	Stay Green	null	null	null	SBI-01	SBI-01	1.0	0.258	176.84	173.54	180.13

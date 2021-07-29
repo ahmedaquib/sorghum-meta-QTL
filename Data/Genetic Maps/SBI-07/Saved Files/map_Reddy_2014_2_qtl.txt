@@ -1,3 +1,0 @@
-mapName=Reddy_2014_2
-QPglm-dsr07-2	Stay Green	null	null	null	SBI-07	SBI-07	1.0	0.10300000000000001	31.9	28.67035863	35.12964137
-QGlm-dsr07-2	Stay Green	null	null	null	SBI-07	SBI-07	1.0	0.066	33.8	28.7598021	38.8401979

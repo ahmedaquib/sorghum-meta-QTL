@@ -1,3 +1,0 @@
-mapName=Subudhi_2000
-Stg1	Stay Green	null	null	null	A	A	1.0	0.154	42.5	37.09978797	47.90021203
-Stg2	Stay Green	null	null	null	A	A	1.0	0.19899999999999998	85.0	80.82094144	89.17905856

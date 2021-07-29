@@ -1,4 +1,0 @@
-mapName=Srinivas_2008
-QGlam-sbi01-1	Stay Green	null	null	null	SBI-01	SBI-01	7.4	0.01	32.8	10.32344181	55.27655819
-QGlaa-sbi01	Stay Green	null	null	null	SBI-01	SBI-01	11.8	0.01	52.5	38.4045313	66.5954687
-QGlam-sbi01-2	Stay Green	null	null	null	SBI-01	SBI-01	8.7	0.01	52.5	33.38200798	71.61799202

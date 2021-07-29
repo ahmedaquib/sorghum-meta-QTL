@@ -1,13 +1,109 @@
-library(circlize)
-library(dplyr)
+library(readr)
 library(tidyr)
+library(dplyr)
+library(biomaRt)
 library(GenomicRanges)
 library(RColorBrewer)
 library(yarrr)
+library(circlize)
+
+setwd("C:/Users/Shabana Usmani/sorghum-meta/sorghum-meta-QTL")
+#############################   Physical Interval    #######################################################
+# Load Physical Data
+location_ref_genome <- read_tsv("./Data/Ramu_Jun.txt", col_names = TRUE)
+location_ref_genome <- dplyr::slice(location_ref_genome,-grep("SB",location_ref_genome$`Locus name`)) %>%
+  dplyr::select(`Locus name`,`Physical Map Position`)
+location_ref_genome$`Locus name` <- gsub("X","",location_ref_genome$`Locus name`) %>%
+  tolower()
+location_ref_genome <- location_ref_genome[!duplicated(location_ref_genome$`Locus name`),]
+
+# Granges list from all the consensus maps
+files <- list.files("./Results/Consensus Maps")
+i <- grep("map",files)
+j <- 1
+Consensus <- data.frame()
+for(i in i){
+  Chromosome <- strsplit(strsplit(files[i], split = " ")[[1]][2],split = ".txt")[[1]]
+  f <- read.table(paste0("./Results/Consensus Maps/",files[i]), sep="\t", skip=13, row.names = 1, fill = TRUE)
+  f$Chromosome <- rep(Chromosome,dim(f)[1])
+  Consensus <- rbind(Consensus,f)
+  j=j+1
+}
+remove(files,i,j,f, Chromosome)
+Consensus <- data.frame(chr=Consensus$Chromosome,start=Consensus$V3,end = Consensus$V3+1,feature=tolower(Consensus$V2))
+Consensus <- left_join(Consensus,location_ref_genome, by=c("feature"="Locus name"))           # Joining with Physical data
+Consensus <- Consensus[is.na(Consensus$`Physical Map Position`)==FALSE,]
+Consensus <- Consensus[!duplicated(Consensus$feature),]
+
+# Removing markers with incorrect locus order 
+Temp <- split.data.frame(Consensus, Consensus$chr)
+vec <- function(x){
+  v <- 0
+  for(i in 2:dim(x)[1]){
+    v <- c(v,x[i,5]-x[i-1,5])
+  }
+  return(v)
+}
+Temp <- sapply(Temp, vec, simplify = `array`)
+Temp <- unlist(Temp, use.names = FALSE)
+Consensus$Diff <- Temp
+Consensus <- Consensus[Consensus$Diff>=0,]
+# Making Granges Object
+GR <- makeGRangesFromDataFrame(Consensus, keep.extra.columns=TRUE)
+# Import Meta QTL Locations
+meta <- read_tsv("./Results/Meta.txt")
+gr <- makeGRangesFromDataFrame(meta)
+# Get markers inside or flanking the Meta-QTL
+df <- data.frame()
+for(i in 1:length(ranges(gr))){
+  hits <- subjectHits(findOverlaps(gr[i],GR))
+  if(length(hits)!=0){
+    if((max(hits)+1)>length(GR)){df <- rbind(df,paste(GR[(min(hits)-1):(max(hits))]$feature,collapse = ","))
+    } else df <- rbind(df,paste(GR[(min(hits)-1):(max(hits)+1)]$feature,collapse = ","))
+  } else {
+    hits <- nearest(gr[i],GR)
+    df <- rbind(df,paste(GR[(min(hits)-1):(max(hits)+1)]$feature,collapse = ","))
+  }
+}
+colnames(df) <- "markers"
+values(gr) <- df
+df <- data.frame(MQTL = row.names(df),markers = df$markers)%>%
+  separate_rows(markers,sep = ",", convert = FALSE) %>%
+  left_join(location_ref_genome,by=c("markers"="Locus name"))
+df <- left_join(df,data.frame(MQTL=row.names(meta),meta[,3]),by=c("MQTL"="MQTL"))
+df <- right_join(df,Consensus, by=c("markers"="feature","chr"="chr"))[,1:5]
+df <- df[!is.na(df$MQTL),]
+df <- df[,c(1,4,2,5,3)]
+df <- df[!duplicated(df),]  
+colnames(df) <- c("MQTL","Chr","Marker","cM","Mb")
+
+# Predict Physical interval with lm
+getinterval <- function(i){
+  fit <- filter(df, df$MQTL==i)%>%
+    lm(formula=Mb~cM)%>%predict(newdata = data.frame(cM=unlist(meta[i,1:2], use.names = FALSE)),interval = "confidence", level=0.95)
+  fit <- c(fit[1,2],fit[dim(fit)[1],3])
+  return(fit)
+}
+P95 <- sapply(1:32,getinterval)
+P95 <- t(P95)
+P95 <- data.frame(start=P95[,1], end=P95[,2], Chr=seqnames(gr), MQTL= 1:32)
+P95 <- P95[(P95[,2]-P95[,1])<10,]
+P95$start <- P95$start*10^6
+P95$end <- P95$end*10^6
+P95$Chr <- gsub("SBI-","",P95$Chr)
+p95 <- makeGRangesFromDataFrame(P95, keep.extra.columns = TRUE)
+seqlevels(p95) <- c("10","2","3","4")
+
+#Fetch ensembl_gene_id, start_position, end_position, Sorghum bicolor from the plants_ensembl database
+ensembl <- useMart(biomart = "plants_mart",host = "plants.ensembl.org")
+ensembl <- useDataset(dataset = "sbicolor_eg_gene", mart = ensembl)
+Genes <- getBM(attributes = c('ensembl_gene_id','chromosome_name','start_position','end_position'),filters = 'chromosome_name',values = c("1","2","3","4","7","10"), mart = ensembl)
+GR <- makeGRangesFromDataFrame(Genes,keep.extra.columns=TRUE,seqnames.field=c("chromosome_name"),start.field="start_position",end.field="end_position")
+
 #############################   DATA PREPARATION    #######################################################
-source("C:/Users/Shabana Usmani/sorghum-meta/sorghum-meta-QTL/Physical Interval.R")
+
 ## Consensus Map Data
-setwd("C:/Users/Shabana Usmani/sorghum-meta/sorghum-meta-QTL/Results/Consensus Maps")
+setwd("/Results/Consensus Maps")
 files <- list.files()
 i <- grep("map",files)
 j <- 1
@@ -27,7 +123,7 @@ Consensus1 <- filter(Consensus1,row_number() %% 3 == 1) ## Select every 3rd row 
 
 
 ## QTL Overview Data
-setwd("C:/Users/Shabana Usmani/sorghum-meta/sorghum-meta-QTL/Results/Consensus Maps")
+setwd("/Results/Consensus Maps")
 qtl <- read.table("ALLQTL.txt",sep = "\t",skip = 1) %>% group_by(V6)
 colnames(qtl)[6] <- "chr"
 Sb <- dplyr::select(qtl,chr,V10,V11,V12) %>%
@@ -56,7 +152,7 @@ result$y <- result$y/10
 
 
 ## Meta QTL Locations
-setwd("C:/Users/Shabana Usmani/sorghum-meta/sorghum-meta-QTL/Results")
+setwd("/Results")
 meta <- read.table("Meta-weight.txt", header = TRUE)
 colnames(meta)[3] <- "chr"
 
@@ -109,6 +205,7 @@ ni = brewer.pal(9,"Greens")
 
 #############################   THE CIRCULAR PLOT    #######################################################
 
+# The outer tracks consisting of genetic marker locations, QTL Overview and Meta QTL locations
 f1 <- function(){
   circos.par(cell.padding= c(0,0,0,0))
   circos.initialize(Consensus$chr, x=Consensus$cM)
@@ -138,6 +235,7 @@ f1 <- function(){
   }, bg.border = ov_col[2], bg.col=ht[1])
 }
 
+# The inner tracks consisting of position of meta QTLs on reference genome of Sorghum and Gene Density heat maps
 f2 <- function(){
   circos.par(start.degree=+60)
   circos.par(track.height=0.10)
@@ -156,4 +254,5 @@ f2 <- function(){
   },bg.border = NA)
 }
 
+# Combining outer and inner tracks
 circos.nested(f1,f2,merge2, connection_height = mm_h(7), adjust_start_degree = FALSE, connection_col = ni[merge2[[4]]], connection_border = NA)

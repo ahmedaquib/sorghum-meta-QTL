@@ -1,2 +1,0 @@
-mapName=Tau_2000
-QStg4	Stay Green	null	null	null	SBI-09	SBI-09	1.0	0.109	166.0	161.0808788	170.9191212

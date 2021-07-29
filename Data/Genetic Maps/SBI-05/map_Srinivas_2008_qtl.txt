@@ -1,2 +1,0 @@
-mapName=Srinivas_2008
-QGlaa-sbi05	Stay Green	null	null	null	SBI-05	SBI-05	1.0	0.102	102.8	86.49347739	119.1065226
