@@ -49,20 +49,20 @@ Temp <- unlist(Temp, use.names = FALSE)
 Cons_Joined$Diff <- Temp
 Cons_Joined <- Cons_Joined[Cons_Joined$Diff>=0,]
 # Making Granges Object
-GR <- makeGRangesFromDataFrame(Cons_Joined, keep.extra.columns=TRUE)
+Cons_GR <- makeGRangesFromDataFrame(Cons_Joined, keep.extra.columns=TRUE)
 # Import Meta QTL Locations
 meta <- read_tsv("./Results/Meta.txt")
 gr <- makeGRangesFromDataFrame(meta)
 # Get markers inside or flanking the Meta-QTL
 df <- data.frame()
 for(i in 1:length(ranges(gr))){
-  hits <- subjectHits(findOverlaps(gr[i],GR))
+  hits <- subjectHits(findOverlaps(gr[i],Cons_GR))
   if(length(hits)!=0){
-    if((max(hits)+1)>length(GR)){df <- rbind(df,paste(GR[(min(hits)-1):(max(hits))]$feature,collapse = ","))
-    } else df <- rbind(df,paste(GR[(min(hits)-1):(max(hits)+1)]$feature,collapse = ","))
+    if((max(hits)+1)>length(Cons_GR)){df <- rbind(df,paste(Cons_GR[(min(hits)-1):(max(hits))]$feature,collapse = ","))
+    } else df <- rbind(df,paste(Cons_GR[(min(hits)-1):(max(hits)+1)]$feature,collapse = ","))
   } else {
-    hits <- nearest(gr[i],GR)
-    df <- rbind(df,paste(GR[(min(hits)-1):(max(hits)+1)]$feature,collapse = ","))
+    hits <- nearest(gr[i],Cons_GR)
+    df <- rbind(df,paste(Cons_GR[(min(hits)-1):(max(hits)+1)]$feature,collapse = ","))
   }
 }
 colnames(df) <- "markers"
@@ -98,7 +98,7 @@ seqlevels(p95) <- c("10","2","3","4")
 ensembl <- useMart(biomart = "plants_mart",host = "plants.ensembl.org")
 ensembl <- useDataset(dataset = "sbicolor_eg_gene", mart = ensembl)
 Genes <- getBM(attributes = c('ensembl_gene_id','chromosome_name','start_position','end_position'),filters = 'chromosome_name',values = c("1","2","3","4","7","10"), mart = ensembl)
-GR <- makeGRangesFromDataFrame(Genes,keep.extra.columns=TRUE,seqnames.field=c("chromosome_name"),start.field="start_position",end.field="end_position")
+Genes_GR <- makeGRangesFromDataFrame(Genes,keep.extra.columns=TRUE,seqnames.field=c("chromosome_name"),start.field="start_position",end.field="end_position")
 
 #############################   DATA PREPARATION    #######################################################
 
@@ -143,24 +143,24 @@ colnames(meta)[3] <- "chr"
 
 
 ## Physical Map Data Prep
-end(p95[13]) <- end(GR[seqnames(GR)==10])[length(GR[seqnames(GR)==10])]
+end(p95[13]) <- end(Genes_GR[seqnames(Genes_GR)==10])[length(Genes_GR[seqnames(Genes_GR)==10])]
 pp95<-data.frame(reduce(p95))[,1:3]
 pp95$seqnames <- c("10","02","02","03","03","03","04")
 pp95 <- arrange(pp95, seqnames)
 pp95$regions <- 1:7
 reg_lim<-data.frame(regions=rep(1:7,2),x=c(pp95$start,pp95$end))
 p95_red <- makeGRangesFromDataFrame(pp95, keep.extra.columns = TRUE)
-seqlevels(GR) <- c("01","02","03","04","07","10")
-GR <- makeGRangesFromDataFrame(arrange(data.frame(GR),data.frame(GR)$seqnames))
+seqlevels(Genes_GR) <- c("01","02","03","04","07","10")
+Genes_GR <- makeGRangesFromDataFrame(arrange(data.frame(Genes_GR),data.frame(Genes_GR)$seqnames))
 meta$MQTL <- row.names(meta)
 meta$MQTL <- as.integer(meta$MQTL)
-P95[13,2] <- end(ranges(GR[length(GR)]))
+P95[13,2] <- end(ranges(Genes_GR[length(Genes_GR)]))
 
 # Number of Genes in a 250KB Bins in each region
 all_counts <- NULL
 for(i in 1:7){
   den <- GRanges(seqnames = pp95[i,1], ranges = IRanges(start=seq(pp95[i,2],pp95[i,3],by=250000), width = 250000), region=pp95[i,4])
-  den$count <- countOverlaps(den, GR)
+  den$count <- countOverlaps(den, Genes_GR)
   all_counts <- rbind(all_counts, data.frame(den))
 }
 
@@ -185,8 +185,8 @@ col_fun = colorRamp2(c(min(meta$Wt), mean(meta$Wt), max(meta$Wt)), c("green", "b
 col_fun2 = colorRamp2(c(min(all_counts$count), max(all_counts$count)), c("#D9F0A3", "#004529"))
 ht <- brewer.pal(9, "Greens")[c(1,4)]
 gn <- brewer.pal(9, "Blues")
-ni = brewer.pal(9,"Greens")
-
+#ni = brewer.pal(9,"Greens")
+ni <- c("#78C679","#74C476","#41AB5D","#41AB5D","#41AE76","#74C476","#41AB5D")
 
 #############################   THE CIRCULAR PLOT    #######################################################
 
@@ -232,7 +232,7 @@ f2 <- function(){
     circos.text(CELL_META$xcenter, y=CELL_META$ycenter, labels=paste0("SBI-",pp95$seqnames[which(pp95$regions==reg)]),niceFacing = TRUE,facing = "inside",cex=0.6, col = "grey17")
     circos.axis(h="bottom",direction = "outside" ,labels.facing = "clockwise",major.at = reg_lim$x[reg_lim$regions==reg] ,labels = paste0(round(reg_lim$x[reg_lim$regions==reg]/10^6, digits = 2)),labels.cex = 0.7, labels.col = "grey17", col="grey17")
   },bg.border = NA)
-  circos.par(track.height=0.15)
+  circos.par(track.height=0.25)
   circos.track(c(all_counts$region,all_counts$region),x=c(all_counts$start,all_counts$end),ylim = c(0, 1),track.index=2 ,panel.fun = function(x, y) {
     reg = CELL_META$sector.index
     circos.rect(all_counts[all_counts$region==reg,2], 0, all_counts[all_counts$region==reg,3], 1, col = col_fun2(all_counts[all_counts$region==reg,7]), border=NA)
