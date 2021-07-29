@@ -143,8 +143,8 @@ colnames(meta)[3] <- "chr"
 
 
 ## Physical Map Data Prep
+end(p95[13]) <- end(GR[seqnames(GR)==10])[length(GR[seqnames(GR)==10])]
 pp95<-data.frame(reduce(p95))[,1:3]
-pp95[1,3] <- end(ranges(GR[24621]))
 pp95$seqnames <- c("10","02","02","03","03","03","04")
 pp95 <- arrange(pp95, seqnames)
 pp95$regions <- 1:7
@@ -154,7 +154,7 @@ seqlevels(GR) <- c("01","02","03","04","07","10")
 GR <- makeGRangesFromDataFrame(arrange(data.frame(GR),data.frame(GR)$seqnames))
 meta$MQTL <- row.names(meta)
 meta$MQTL <- as.integer(meta$MQTL)
-P95[13,2] <- end(ranges(GR[24621]))
+P95[13,2] <- end(ranges(GR[length(GR)]))
 
 # Number of Genes in a 250KB Bins in each region
 all_counts <- NULL
