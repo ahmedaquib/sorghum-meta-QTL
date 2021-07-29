@@ -1,2 +1,0 @@
-mapName=Kebede
-Stg F	Stay Green	null	null	null	SBI-06	SBI-06	1.0	114	105	99.28070175	110.7192982
