@@ -1,8 +1,0 @@
-seqnames start end width strand ensembl_gene_id name_1006
-1 2 70532745 70537338 4594 * SORBI_3002G338100 chlorophyll catabolic process
-2 3 59623226 59628704 5479 * SORBI_3003G258200 chlorophyll catabolic process
-3 10 59356247 59360431 4185 * SORBI_3010G255100 chlorophyll biosynthetic process
-4 2 4314764 4325408 10645 * SORBI_3002G045700 chlorophyll biosynthetic process
-5 2 69913557 69917142 3586 * SORBI_3002G330500 chlorophyll biosynthetic process
-6 3 56109187 56114373 5187 * SORBI_3003G225100 chlorophyll biosynthetic process
-7 3 56905075 56908417 3343 * SORBI_3003G229600 positive regulation of chlorophyll biosynthetic process

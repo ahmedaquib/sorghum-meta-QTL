@@ -10,7 +10,7 @@ library(circlize)
 setwd("C:/Users/Shabana Usmani/sorghum-meta/sorghum-meta-QTL")
 #############################   Physical Interval    #######################################################
 # Load Physical Data
-location_ref_genome <- read_tsv("./Data/Ramu_Jun.txt", col_names = TRUE)
+location_ref_genome <- read_tsv("./Results/Ramu_Jun.txt", col_names = TRUE)
 location_ref_genome <- dplyr::slice(location_ref_genome,-grep("SB",location_ref_genome$`Locus name`)) %>%
   dplyr::select(`Locus name`,`Physical Map Position`)
 location_ref_genome$`Locus name` <- gsub("X","",location_ref_genome$`Locus name`) %>%
@@ -31,12 +31,12 @@ for(i in i){
 }
 remove(files,i,j,f, Chromosome)
 Consensus <- data.frame(chr=Consensus$Chromosome,start=Consensus$V3,end = Consensus$V3+1,feature=tolower(Consensus$V2))
-Consensus <- left_join(Consensus,location_ref_genome, by=c("feature"="Locus name"))           # Joining with Physical data
-Consensus <- Consensus[is.na(Consensus$`Physical Map Position`)==FALSE,]
-Consensus <- Consensus[!duplicated(Consensus$feature),]
+Cons_Joined <- left_join(Consensus,location_ref_genome, by=c("feature"="Locus name"))           # Joining with Physical data
+Cons_Joined <- Cons_Joined[is.na(Cons_Joined$`Physical Map Position`)==FALSE,]
+Cons_Joined <- Cons_Joined[!duplicated(Cons_Joined$feature),]
 
 # Removing markers with incorrect locus order 
-Temp <- split.data.frame(Consensus, Consensus$chr)
+Temp <- split.data.frame(Cons_Joined, Cons_Joined$chr)
 vec <- function(x){
   v <- 0
   for(i in 2:dim(x)[1]){
@@ -46,10 +46,10 @@ vec <- function(x){
 }
 Temp <- sapply(Temp, vec, simplify = `array`)
 Temp <- unlist(Temp, use.names = FALSE)
-Consensus$Diff <- Temp
-Consensus <- Consensus[Consensus$Diff>=0,]
+Cons_Joined$Diff <- Temp
+Cons_Joined <- Cons_Joined[Cons_Joined$Diff>=0,]
 # Making Granges Object
-GR <- makeGRangesFromDataFrame(Consensus, keep.extra.columns=TRUE)
+GR <- makeGRangesFromDataFrame(Cons_Joined, keep.extra.columns=TRUE)
 # Import Meta QTL Locations
 meta <- read_tsv("./Results/Meta.txt")
 gr <- makeGRangesFromDataFrame(meta)
@@ -71,7 +71,7 @@ df <- data.frame(MQTL = row.names(df),markers = df$markers)%>%
   separate_rows(markers,sep = ",", convert = FALSE) %>%
   left_join(location_ref_genome,by=c("markers"="Locus name"))
 df <- left_join(df,data.frame(MQTL=row.names(meta),meta[,3]),by=c("MQTL"="MQTL"))
-df <- right_join(df,Consensus, by=c("markers"="feature","chr"="chr"))[,1:5]
+df <- right_join(df,Cons_Joined, by=c("markers"="feature","chr"="chr"))[,1:5]
 df <- df[!is.na(df$MQTL),]
 df <- df[,c(1,4,2,5,3)]
 df <- df[!duplicated(df),]  
@@ -103,28 +103,14 @@ GR <- makeGRangesFromDataFrame(Genes,keep.extra.columns=TRUE,seqnames.field=c("c
 #############################   DATA PREPARATION    #######################################################
 
 ## Consensus Map Data
-setwd("/Results/Consensus Maps")
-files <- list.files()
-i <- grep("map",files)
-j <- 1
-Consensus <- data.frame()
-for(i in i){
-  Chromosome <- strsplit(strsplit(files[i], split = " ")[[1]][2],split = ".txt")[[1]]
-  f <- read.table(paste0(files[i]), sep="\t", skip=13, row.names = 1, fill = TRUE)
-  f$Chromosome <- rep(Chromosome,dim(f)[1])
-  Consensus <- rbind(Consensus,f)
-  j=j+1
-}
-remove(files,i,j,f, Chromosome)
-Consensus <- data.frame(chr=as.factor(Consensus$Chromosome),cM=Consensus$V3,Marker=tolower(Consensus$V2))
-Consensus1 <- filter(Consensus,row_number() %% 3 == 1) ## Select every 3rd row starting from first row
-Consensus1 <- filter(Consensus1,row_number() %% 3 == 1) ## Select every 3rd row starting from first row
-Consensus1 <- filter(Consensus1,row_number() %% 3 == 1) ## Select every 3rd row starting from first row
+Consensus <- data.frame(chr=as.factor(Consensus$chr),cM=Consensus$start,Marker=tolower(Consensus$feature))
+Consensus_subset <- filter(Consensus,row_number() %% 3 == 1) ## Select every 3rd row starting from first row
+Consensus_subset <- filter(Consensus_subset,row_number() %% 3 == 1) ## Select every 3rd row starting from first row
+Consensus_subset <- filter(Consensus_subset,row_number() %% 3 == 1) ## Select every 3rd row starting from first row
 
 
 ## QTL Overview Data
-setwd("/Results/Consensus Maps")
-qtl <- read.table("ALLQTL.txt",sep = "\t",skip = 1) %>% group_by(V6)
+qtl <- read.table("./Results/Consensus Maps/ALLQTL.txt",sep = "\t",skip = 1) %>% group_by(V6)
 colnames(qtl)[6] <- "chr"
 Sb <- dplyr::select(qtl,chr,V10,V11,V12) %>%
   transmute(chr=chr,mean=V10,sd=(V12-V11)/(2*1.96))
@@ -152,8 +138,7 @@ result$y <- result$y/10
 
 
 ## Meta QTL Locations
-setwd("/Results")
-meta <- read.table("Meta-weight.txt", header = TRUE)
+meta <- read.table("./Results/Meta-weight.txt", header = TRUE)
 colnames(meta)[3] <- "chr"
 
 
@@ -215,9 +200,9 @@ f1 <- function(){
     ycenter=CELL_META$ycenter
     circos.rect(xlim[1], 0, xlim[2], 0.3, col = rand_color(10, hue = "green", luminosity = "dark"), border=NA)
     circos.segments(x, rep(0,length(x)),x, rep(0.3,length(x)), col="black")
-    x = Consensus1$cM[Consensus1$chr==CELL_META$sector.index]
+    x = Consensus_subset$cM[Consensus_subset$chr==CELL_META$sector.index]
     circos.segments(x, rep(0,length(x)),x, rep(0.4,length(x)), col="black")
-    circos.text(x, rep(0.75,length(x)),Consensus1$Marker[Consensus1$chr==CELL_META$sector.index],niceFacing = TRUE,facing = "clockwise",cex=0.8, font = 3)
+    circos.text(x, rep(0.75,length(x)),Consensus_subset$Marker[Consensus_subset$chr==CELL_META$sector.index],niceFacing = TRUE,facing = "clockwise",cex=0.8, font = 3)
     circos.text(xcenter,ycenter/3,labels = CELL_META$sector.index, col = "floralwhite", font = 2)
   },bg.border = NA)
   circos.par(track.height=0.12)
