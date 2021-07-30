@@ -185,7 +185,6 @@ col_fun = colorRamp2(c(min(meta$Wt), mean(meta$Wt), max(meta$Wt)), c("green", "b
 col_fun2 = colorRamp2(c(min(all_counts$count), max(all_counts$count)), c("#D9F0A3", "#004529"))
 ht <- brewer.pal(9, "Greens")[c(1,4)]
 gn <- brewer.pal(9, "Blues")
-#ni = brewer.pal(9,"Greens")
 ni <- c("#78C679","#74C476","#41AB5D","#41AB5D","#41AE76","#74C476","#41AB5D")
 
 #############################   THE CIRCULAR PLOT    #######################################################
